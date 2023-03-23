@@ -27,7 +27,7 @@ const FilmMainInfo = props => {
   const generateGenres = () => {
     const filmGenresIds = filmGenres.map(({ id }) => id);
     return genres
-      .filter(genre => (filmGenresIds.includes(genre.id) ? genre.name : ''))
+      .filter(genre => filmGenresIds.includes(genre.id))
       .map(genre => genre.name)
       .join(', ');
   };
