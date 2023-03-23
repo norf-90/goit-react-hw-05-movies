@@ -5,6 +5,7 @@ const FilmMainInfo = props => {
   const [genres, setGenres] = useState(() =>
     JSON.parse(localStorage.getItem('genres'))
   );
+
   const {
     title,
     poster_path,
@@ -33,23 +34,25 @@ const FilmMainInfo = props => {
   };
 
   return (
-    <div>
+    genres && (
       <div>
-        <img
-          src={`https://image.tmdb.org/t/p/w500${poster_path}`}
-          alt={`${title} poster`}
-          width="200"
-        />
+        <div>
+          <img
+            src={`https://image.tmdb.org/t/p/w500${poster_path}`}
+            alt={`${title} poster`}
+            width="200"
+          />
+        </div>
+        <div>
+          <h2>{title}</h2>
+          <p>Genres: {generateGenres()}</p>
+          <p>Release: {release_date}</p>
+          <p>Budget: {budget} $</p>
+          <p>Votes: {vote_average}</p>
+          <p>{overview}</p>
+        </div>
       </div>
-      <div>
-        <h2>{title}</h2>
-        <p>Genres: {generateGenres()}</p>
-        <p>Release: {release_date}</p>
-        <p>Budget: {budget} $</p>
-        <p>Votes: {vote_average}</p>
-        <p>{overview}</p>
-      </div>
-    </div>
+    )
   );
 };
 
