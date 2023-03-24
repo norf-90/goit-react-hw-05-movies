@@ -1,7 +1,8 @@
 import FilmMainInfo from 'components/FilmMainInfo/FIlmMainInfo';
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import { getMovieDetails } from 'utils/getFunctions';
+import { StyledLink, List } from './MovieDetails.styled';
 
 const MovieDetais = () => {
   const { movieId } = useParams();
@@ -9,37 +10,40 @@ const MovieDetais = () => {
   const [status, setStatus] = useState('idle');
 
   useEffect(() => {
+    const abortController = new AbortController();
     setStatus('pending');
 
-    getMovieDetails(movieId)
+    getMovieDetails(movieId, abortController)
       .then(responce => {
         setMovieDetails(responce.data);
         setStatus('resolved');
       })
       .catch(() => setStatus('rejected'));
+
+    return () => {
+      abortController.abort();
+    };
   }, [movieId]);
 
   return (
-    <>
-      <div>
-        {status === 'pending' && <p>Loading...</p>}
-        {status === 'resolved' && (
-          <>
-            <FilmMainInfo moviedDetails={moviedDetails} />
-            <ul>
-              <li>
-                <NavLink to="cast">Cast</NavLink>
-              </li>
-              <li>
-                <NavLink to="reviews">Reviews</NavLink>
-              </li>
-              <Outlet />
-            </ul>
-          </>
-        )}
-        {status === 'rejected' && <p>rejected</p>}
-      </div>
-    </>
+    <div>
+      {status === 'pending' && <p>Loading...</p>}
+      {status === 'resolved' && (
+        <>
+          <FilmMainInfo moviedDetails={moviedDetails} />
+          <List>
+            <li>
+              <StyledLink to="cast">Cast</StyledLink>
+            </li>
+            <li>
+              <StyledLink to="reviews">Reviews</StyledLink>
+            </li>
+          </List>
+          <Outlet />
+        </>
+      )}
+      {status === 'rejected' && <p>rejected</p>}
+    </div>
   );
 };
 

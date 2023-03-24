@@ -1,13 +1,14 @@
 import FilmItem from 'components/FilmItem/FilmItem';
+import { List } from './FilmList.styled';
 
 const FilmList = props => {
   const { films } = props;
   return (
-    <ul>
+    <List>
       {films.map(({ id, ...filmInfo }) => (
         <FilmItem key={id} film={{ ...filmInfo, id }} />
       ))}
-    </ul>
+    </List>
   );
 };
 

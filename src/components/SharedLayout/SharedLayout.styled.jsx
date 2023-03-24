@@ -3,12 +3,12 @@ import styled from 'styled-components';
 
 export const StyledLink = styled(NavLink)`
   display: block;
-  padding: 20px 50px;
-  border-radius: 20px;
-  color: #000000;
+  padding: 10px 50px;
+  border-radius: 10px;
+  color: #ffffff;
 
   &.active {
-    background-color: #481875;
+    background-color: #9a000d;
     color: #ffffff;
   }
 `;

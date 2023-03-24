@@ -1,25 +1,29 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getCast } from 'utils/getFunctions';
+import { List, ListItem } from './Cast.styled';
 
 const Cast = () => {
   const [cast, setCast] = useState(null);
   const { movieId } = useParams();
 
   useEffect(() => {
-    getCast(movieId)
+    const abortController = new AbortController();
+    getCast(movieId, abortController)
       .then(({ data: { cast } }) => {
         setCast(cast);
       })
       .catch();
+
+    return () => abortController.abort();
   }, [movieId]);
 
   return (
-    <ul>
+    <List>
       {cast &&
         cast.map(({ name, profile_path, character, id }) => {
           return (
-            <li key={id}>
+            <ListItem key={id}>
               <h3>{name}</h3>
               <img
                 src={
@@ -31,10 +35,10 @@ const Cast = () => {
                 width="100"
               />
               <p>Character: {character}</p>
-            </li>
+            </ListItem>
           );
         })}
-    </ul>
+    </List>
   );
 };
 

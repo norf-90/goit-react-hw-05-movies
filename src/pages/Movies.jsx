@@ -1,40 +1,52 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FilmList from 'components/FilmList/FilmList';
 import { getMovie } from 'utils/getFunctions';
+import { SearchForm, SubmitButton, SearchInput } from './Movies.styled';
 
 const Movies = () => {
   const [films, setFilms] = useState(null);
   const [status, setStatus] = useState('idle');
-  const [searchName, setSearchName] = useState('');
+  const [searchValue, setSearchValue] = useState('');
+  // let abortController = useRef();
 
-  const handleChange = () => {
-    const form = document.getElementById('query');
-    setSearchName(form.elements.name.value);
-  };
+  // const updateAbortController = newAbortController => {
+  //   abortController.current = newAbortController;
+  // };
 
   const handleSubmit = e => {
     e.preventDefault();
+    const form = document.getElementById('query');
+    setSearchValue(form.elements.searchValue.value);
+  };
+
+  useEffect(() => {
+    if (!searchValue.trim()) return;
+    const abortController = new AbortController();
     setStatus('pending');
-    getMovie(searchName)
+    getMovie(searchValue, abortController)
       .then(({ data }) => {
         setFilms(data.results);
         setStatus('resolved');
       })
       .catch(() => setStatus('rejected'));
-  };
+
+    return () => {
+      abortController.abort();
+    };
+  }, [searchValue]);
 
   return (
     <main>
-      <form id="query" onSubmit={handleSubmit}>
-        <input
+      <SearchForm id="query" onSubmit={handleSubmit}>
+        <SearchInput
           type="text"
-          onChange={handleChange}
-          name="name"
-          value={searchName}
+          name="searchValue"
           placeholder="input film name"
+          required
+          autoComplete="off"
         />
-        <button type="submit">Search</button>
-      </form>
+        <SubmitButton type="submit">Search</SubmitButton>
+      </SearchForm>
       {status === 'pending' && <p>Loading</p>}
       {status === 'resolved' && <FilmList films={films} />}
       {status === 'rejected' && <p>Something went wrong</p>}

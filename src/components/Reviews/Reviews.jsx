@@ -1,27 +1,33 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getReviews } from 'utils/getFunctions';
+import { List, Rewiev, Header, Text } from './Reviews.styled';
 
 const Reviews = () => {
   const [reviews, setReviews] = useState(null);
   const { movieId } = useParams();
 
   useEffect(() => {
-    getReviews(movieId)
+    const abortController = new AbortController();
+    getReviews(movieId, abortController)
       .then(({ data: { results } }) => {
         setReviews(results);
       })
       .catch();
+
+    return () => {
+      abortController.abort();
+    };
   }, [movieId]);
 
   return (
     reviews && (
-      <ul>
+      <List>
         {reviews.map(
           ({ id, content, author, author_details: { avatar_path } }) => {
             return (
-              <li key={id}>
-                <div>
+              <Rewiev key={id}>
+                <Header>
                   {avatar_path && (
                     <img
                       src={
@@ -34,13 +40,13 @@ const Reviews = () => {
                     />
                   )}
                   <p>{author}</p>
-                </div>
-                <p>{content}</p>
-              </li>
+                </Header>
+                <Text>{content}</Text>
+              </Rewiev>
             );
           }
         )}
-      </ul>
+      </List>
     )
   );
 };

@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
 import { getGenres } from 'utils/getFunctions';
+import {
+  Wrapper,
+  Title,
+  TextWrapper,
+  Text,
+  Property,
+} from './FilmMainInfo.styled';
 
 const FilmMainInfo = props => {
   const [genres, setGenres] = useState(() =>
@@ -35,23 +42,30 @@ const FilmMainInfo = props => {
 
   return (
     genres && (
-      <div>
-        <div>
-          <img
-            src={`https://image.tmdb.org/t/p/w500${poster_path}`}
-            alt={`${title} poster`}
-            width="200"
-          />
-        </div>
-        <div>
-          <h2>{title}</h2>
-          <p>Genres: {generateGenres()}</p>
-          <p>Release: {release_date}</p>
-          <p>Budget: {budget} $</p>
-          <p>Votes: {vote_average}</p>
-          <p>{overview}</p>
-        </div>
-      </div>
+      <Wrapper>
+        <img
+          src={`https://image.tmdb.org/t/p/w500${poster_path}`}
+          alt={`${title} poster`}
+          width="200"
+        />
+
+        <TextWrapper>
+          <Title>{title}</Title>
+          <Text>
+            <Property>Genres:</Property> {generateGenres()}
+          </Text>
+          <Text>
+            <Property>Release:</Property> {release_date}
+          </Text>
+          <Text>
+            <Property>Budget:</Property> {budget} $
+          </Text>
+          <Text>
+            <Property>Votes:</Property> {vote_average}
+          </Text>
+          <Text>{overview}</Text>
+        </TextWrapper>
+      </Wrapper>
     )
   );
 };
