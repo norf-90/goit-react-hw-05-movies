@@ -1,29 +1,52 @@
+import { lazy, Suspense } from 'react';
 import { useEffect, useState } from 'react';
-import FilmList from 'components/FilmList/FilmList';
 import { getMovie } from 'utils/getFunctions';
-import { SearchForm, SubmitButton, SearchInput } from './Movies.styled';
+const FilmList = lazy(() => import('components/FilmList/FilmList'));
+const SearchForm = lazy(() =>
+  import('./Movies.styled').then(module => ({
+    ...module,
+    default: module.SearchForm,
+  }))
+);
+const SubmitButton = lazy(() =>
+  import('./Movies.styled').then(module => ({
+    ...module,
+    default: module.SubmitButton,
+  }))
+);
+const SearchInput = lazy(() =>
+  import('./Movies.styled').then(module => ({
+    ...module,
+    default: module.SearchInput,
+  }))
+);
 
 const Movies = () => {
   const [films, setFilms] = useState(null);
   const [status, setStatus] = useState('idle');
+  const [inputValue, setInputValue] = useState('');
   const [searchValue, setSearchValue] = useState('');
-  // let abortController = useRef();
 
-  // const updateAbortController = newAbortController => {
-  //   abortController.current = newAbortController;
-  // };
+  const handleChange = () => {
+    const form = document.getElementById('query');
+    setInputValue(form.elements.searchValue.value);
+  };
 
   const handleSubmit = e => {
     e.preventDefault();
-    const form = document.getElementById('query');
-    setSearchValue(form.elements.searchValue.value);
+    setSearchValue(inputValue);
+    setInputValue('');
   };
 
   useEffect(() => {
     if (!searchValue.trim()) return;
-    const abortController = new AbortController();
+    let abortController = new AbortController();
+
+    const updateAbortController = newAbortController =>
+      (abortController = newAbortController);
+
     setStatus('pending');
-    getMovie(searchValue, abortController)
+    getMovie(searchValue, abortController, updateAbortController)
       .then(({ data }) => {
         setFilms(data.results);
         setStatus('resolved');
@@ -40,15 +63,21 @@ const Movies = () => {
       <SearchForm id="query" onSubmit={handleSubmit}>
         <SearchInput
           type="text"
+          value={inputValue}
           name="searchValue"
           placeholder="input film name"
           required
+          onChange={handleChange}
           autoComplete="off"
         />
         <SubmitButton type="submit">Search</SubmitButton>
       </SearchForm>
-      {status === 'pending' && <p>Loading</p>}
-      {status === 'resolved' && <FilmList films={films} />}
+      {status === 'pending' && <p>Loading...</p>}
+      {status === 'resolved' && (
+        <Suspense fallback={<p>Loading FilmList ...</p>}>
+          <FilmList films={films} />
+        </Suspense>
+      )}
       {status === 'rejected' && <p>Something went wrong</p>}
     </main>
   );

@@ -1,8 +1,21 @@
-import FilmMainInfo from 'components/FilmMainInfo/FIlmMainInfo';
+// import FilmMainInfo from 'components/FilmMainInfo/FIlmMainInfo';
 import { useEffect, useState } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
 import { getMovieDetails } from 'utils/getFunctions';
-import { StyledLink, List } from './MovieDetails.styled';
+import { lazy, Suspense } from 'react';
+const FilmMainInfo = lazy(() => import('components/FilmMainInfo/FIlmMainInfo'));
+const StyledLink = lazy(() =>
+  import('./MovieDetails.styled').then(module => ({
+    ...module,
+    default: module.StyledLink,
+  }))
+);
+const List = lazy(() =>
+  import('./MovieDetails.styled').then(module => ({
+    ...module,
+    default: module.List,
+  }))
+);
 
 const MovieDetais = () => {
   const { movieId } = useParams();
@@ -30,16 +43,18 @@ const MovieDetais = () => {
       {status === 'pending' && <p>Loading...</p>}
       {status === 'resolved' && (
         <>
-          <FilmMainInfo moviedDetails={moviedDetails} />
-          <List>
-            <li>
-              <StyledLink to="cast">Cast</StyledLink>
-            </li>
-            <li>
-              <StyledLink to="reviews">Reviews</StyledLink>
-            </li>
-          </List>
-          <Outlet />
+          <Suspense fallback={<p>Loading FilmMainInfo and Links ... </p>}>
+            <FilmMainInfo moviedDetails={moviedDetails} />
+            <List>
+              <li>
+                <StyledLink to="cast">Cast</StyledLink>
+              </li>
+              <li>
+                <StyledLink to="reviews">Reviews</StyledLink>
+              </li>
+            </List>
+            <Outlet />
+          </Suspense>
         </>
       )}
       {status === 'rejected' && <p>rejected</p>}

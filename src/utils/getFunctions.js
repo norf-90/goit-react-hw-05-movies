@@ -30,11 +30,18 @@ const getReviews = (id, abortController) =>
     signal: abortController.signal,
   });
 
-const getMovie = (searchName, abortController) => {
+const getMovie = (searchName, abortController, updateAbortController) => {
+  if (abortController) {
+    abortController.abort();
+  }
+
+  const newAborController = new AbortController();
+  updateAbortController(newAborController);
+
   return axios.get(
     `${BASE_URL}search/movie?api_key=${KEY}&query=${searchName}&page=1&include_adult=false`,
     {
-      signal: abortController.signal,
+      signal: newAborController.signal,
     }
   );
 };

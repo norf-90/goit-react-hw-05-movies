@@ -1,7 +1,8 @@
-import FilmList from 'components/FilmList/FilmList';
+import { lazy } from 'react';
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
-// import { ClipLoader } from 'react-spinners';
 import { getTrends } from 'utils/getFunctions';
+const FilmList = lazy(() => import('components/FilmList/FilmList'));
 
 const Home = () => {
   const [films, setFilms] = useState();
@@ -24,8 +25,12 @@ const Home = () => {
 
   return (
     <main>
-      {/* {status === 'pending' && <ClipLoader color="#ffffff" />} */}
-      {status === 'resolved' && <FilmList films={films} />}
+      {status === 'pending' && <p>Loading...</p>}
+      {status === 'resolved' && (
+        <Suspense fallback={<p>Loading FilmList...</p>}>
+          <FilmList films={films} />
+        </Suspense>
+      )}
       {status === 'rejected' && <p>Something went wrong</p>}
     </main>
   );
